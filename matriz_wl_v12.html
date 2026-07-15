@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<title>Matriz WL — CVR × Penetración | Despegar B2B2C</title>
+<style>
+:root{--ma-bg:rgba(56,189,248,.10);--ma-bd:#38bdf8;--ma-tx:#7dd3fc;
+  --ll-bg:rgba(139,92,246,.10);--ll-bd:#8b5cf6;--ll-tx:#c4b5fd;
+  --cv-bg:rgba(22,163,74,.10);--cv-bd:#22c55e;--cv-tx:#4ade80;
+  --do-bg:rgba(234,88,12,.10);--do-bd:#f97316;--do-tx:#fb923c;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.hdr{background:linear-gradient(135deg,#1e293b,#0f172a);border-bottom:1px solid #334155;padding:12px 28px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.hdr-l h1{font-size:17px;font-weight:700;color:#f8fafc}.hdr-l h1 span{color:#38bdf8}
+.hdr-l p{font-size:11px;color:#64748b;margin-top:2px}
+.hdr-r{font-size:11px;color:#64748b;text-align:right;line-height:1.7}
+.body{display:flex;flex:1;overflow:hidden}
+.sb{width:282px;min-width:252px;background:#1e293b;border-right:1px solid #334155;display:flex;flex-direction:column;overflow:hidden}
+.sb-sec{padding:12px 14px;border-bottom:1px solid #334155;flex-shrink:0}
+.sb-sec h3{font-size:10px;text-transform:uppercase;letter-spacing:.9px;color:#475569;margin-bottom:9px}
+.def-box{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px 12px;font-size:11px;color:#94a3b8;line-height:1.9}
+.def-box b{color:#e2e8f0}
+.tag{display:inline-block;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px}
+.tag.gold{background:rgba(250,204,21,.12);color:#fbbf24}
+.tag.pub{background:rgba(56,189,248,.12);color:#38bdf8}
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.mb{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 10px}
+.mb .mv{font-size:16px;font-weight:700;color:#38bdf8}.mb .ml{font-size:10px;color:#64748b;margin-top:1px}
+.qc{border-radius:8px;padding:9px 12px;margin-bottom:6px;cursor:pointer;border:1.5px solid transparent;transition:all .15s}
+.qc:hover{filter:brightness(1.1)}.qc.active{border-color:currentColor}
+.qc.MADUROS   {background:var(--ma-bg);color:var(--ma-tx)}
+.qc.LLEGAN    {background:var(--ll-bg);color:var(--ll-tx)}
+.qc.CONVERSION{background:var(--cv-bg);color:var(--cv-tx)}
+.qc.DOBLE_OPP {background:var(--do-bg);color:var(--do-tx)}
+.qt{font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px}
+.qd{font-size:10px;opacity:.8;margin-top:3px;line-height:1.4}
+.qst{float:right;font-size:11px;font-weight:600;opacity:.7;text-align:right;line-height:1.3}
+.sb-scroll{flex:1;overflow-y:auto;padding:10px 12px}
+.search{width:100%;padding:7px 10px;border-radius:6px;border:1px solid #334155;background:#0f172a;color:#e2e8f0;font-size:12px;outline:none;margin-bottom:8px}
+.search:focus{border-color:#38bdf8}
+.pi{padding:7px 8px;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;border-left:3px solid transparent;transition:background .1s}
+.pi:hover{background:#334155}
+.pn{font-weight:600;color:#e2e8f0;font-size:12px}.ps{font-size:10px;color:#64748b;margin-top:1px}.pg{color:#94a3b8;font-size:11px;text-align:right}
+.excl{background:#0f172a;border:1px solid #1c1917;border-radius:7px;padding:8px 10px;margin-top:8px;font-size:10px;color:#78716c;line-height:1.6}.excl b{color:#a8a29e}
+.ca{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.cw{flex:1;position:relative;padding:18px 22px 4px 22px}
+canvas{display:block}
+.yl{position:absolute;left:4px;top:50%;transform:translateX(-50%) rotate(-90deg);font-size:10px;color:#475569;white-space:nowrap;letter-spacing:.5px;text-transform:uppercase;font-weight:600}
+.xl{text-align:center;font-size:10px;color:#475569;padding:3px 0 5px;letter-spacing:.5px;text-transform:uppercase;font-weight:600;flex-shrink:0}
+.fb{background:#1e293b;border-top:1px solid #334155;padding:7px 20px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex-shrink:0}
+.fb-btn{padding:4px 12px;border-radius:20px;border:1px solid #334155;background:transparent;color:#94a3b8;font-size:11px;cursor:pointer;transition:all .15s}
+.fb-btn:hover{border-color:#38bdf8;color:#38bdf8}.fb-btn.active{background:#1d4ed8;border-color:#1d4ed8;color:#fff;font-weight:600}
+.tt{position:fixed;background:#1e293b;border:1px solid #475569;border-radius:12px;padding:14px 16px;pointer-events:none;display:none;z-index:9999;min-width:275px;max-width:315px;box-shadow:0 12px 40px rgba(0,0,0,.65)}
+.tt-name{font-size:14px;font-weight:700;color:#f8fafc;margin-bottom:4px}
+.tt-badge{font-size:10px;font-weight:700;border-radius:4px;padding:2px 7px;display:inline-block;margin-bottom:10px}
+.tt-sec{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:#475569;margin:8px 0 5px;font-weight:600}
+.tt-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;color:#94a3b8;gap:10px}
+.tt-val{font-weight:600;color:#e2e8f0;text-align:right}
+.tt-val.pos{color:#4ade80}.tt-val.neg{color:#f87171}.tt-val.hl{color:#38bdf8}
+.tt-div{border-top:1px solid #334155;margin:7px 0}
+.bar-wrap{margin-top:6px}.bar-lbl{display:flex;justify-content:space-between;font-size:11px;color:#94a3b8;margin-bottom:3px}
+.bar-track{height:6px;background:#0f172a;border-radius:3px;border:1px solid #334155;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#334155;border-radius:2px}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-l">
+    <h1>Matriz <span>CVR × Penetración de Clientes</span> — White Labels B2B2C</h1>
+    <p>Despegar · CVR: Gold H1 2026 · Penetración: searchers promedio mensual / base total de clientes · Burbuja = GB 12m</p>
+  </div>
+  <div class="hdr-r">31 partners · CVR med. 3.94% · Pen. med. 0.408%</div>
+</div>
+<div class="body">
+<div class="sb">
+  <div class="sb-sec">
+    <h3>Definición de ejes</h3>
+    <div class="def-box">
+      <b>Eje X — CVR</b><span class="tag gold">Gold</span><br>
+      bookings / searchers · H1 2026<br><br>
+      <b>Eje Y — Penetración</b><span class="tag pub">Fuentes públicas</span><br>
+      (searchers H1 2026 / 6) / base total clientes<br>
+      <span style="font-size:10px;opacity:.7">% de clientes que buscaron en el WL por mes</span>
+    </div>
+  </div>
+  <div class="sb-sec">
+    <h3>Resumen</h3>
+    <div class="mg">
+      <div class="mb"><div class="mv">31</div><div class="ml">Partners</div></div>
+      <div class="mb"><div class="mv">1.41%</div><div class="ml">CVR global</div></div>
+      <div class="mb"><div class="mv">0.41%</div><div class="ml">Pen. mediana</div></div>
+      <div class="mb"><div class="mv">3.9%</div><div class="ml">CVR mediana</div></div>
+    </div>
+  </div>
+  <div class="sb-sec">
+    <h3>Cuadrantes</h3>
+    <div class="qc MADUROS" id="qc-MADUROS" onclick="fq('MADUROS',this)">
+      <div class="qst">5 WL<br>$140.8M</div>
+      <div class="qt">✅ Alta pen. + Alta CVR</div>
+      <div class="qd">Alta penetración mensual y buena conversión. Defender y eficientar.</div>
+    </div>
+    <div class="qc LLEGAN" id="qc-LLEGAN" onclick="fq('LLEGAN',this)">
+      <div class="qst">11 WL<br>$333.6M</div>
+      <div class="qt">🔧 Alta pen. + Baja CVR</div>
+      <div class="qd">Muchos clientes buscan pero pocos convierten. Foco en producto y precio.</div>
+    </div>
+    <div class="qc CONVERSION" id="qc-CONVERSION" onclick="fq('CONVERSION',this)">
+      <div class="qst">11 WL<br>$155.4M</div>
+      <div class="qt">📣 Baja pen. + Alta CVR</div>
+      <div class="qd">Pocos llegan pero convierten bien. Invertir en activación de la base.</div>
+    </div>
+    <div class="qc DOBLE_OPP" id="qc-DOBLE_OPP" onclick="fq('DOBLE_OPP',this)">
+      <div class="qst">4 WL<br>$1.6M</div>
+      <div class="qt">🚀 Baja pen. + Baja CVR</div>
+      <div class="qd">Baja penetración y baja conversión. Mayor upside potencial.</div>
+    </div>
+  </div>
+  <div class="sb-scroll">
+    <h3 style="font-size:10px;text-transform:uppercase;letter-spacing:.9px;color:#475569;margin-bottom:8px">Partners — Penetración ↓</h3>
+    <input class="search" id="searchBox" placeholder="Buscar partner…" oninput="fp(this.value)">
+    <div id="partnerList"></div>
+    <div class="excl">
+      <b>Sin base de clientes (10):</b><br>
+      SKY, Mastercard, Awin, Visa, New Fly, ELO, CUTC, AVASA, CSU, Bonda<br><br>
+      <b>Excluidos:</b> YaVas (SaaS) · TuPlus (nueva WL)
+    </div>
+  </div>
+</div>
+<div class="ca">
+  <div class="cw" id="cw">
+    <div class="yl">Penetración mensual — searchers / base total clientes (%)</div>
+    <canvas id="mx"></canvas>
+  </div>
+  <div class="xl">CVR — bookings / searchers (%) · Fuente Gold H1 2026</div>
+  <div class="fb">
+    <span style="font-size:10px;color:#475569">Filtrar:</span>
+    <button class="fb-btn active" onclick="fq('ALL',this)">Todos</button>
+    <button class="fb-btn" onclick="fq('MADUROS',this)">✅ Alta pen. + Alta CVR</button>
+    <button class="fb-btn" onclick="fq('LLEGAN',this)">🔧 Alta pen. + Baja CVR</button>
+    <button class="fb-btn" onclick="fq('CONVERSION',this)">📣 Baja pen. + Alta CVR</button>
+    <button class="fb-btn" onclick="fq('DOBLE_OPP',this)">🚀 Doble opp.</button>
+    <span style="margin-left:auto;font-size:10px;color:#475569">Borde punteado = dato estimado · Burbuja = GB (√) · Divisores = mediana</span>
+  </div>
+</div>
+</div>
+<div class="tt" id="tt"></div>
+<script>
+const PTS=[{"partner": "Latam", "paises": "Argentina, Brasil, Chile, Colombia, Ecuador, Mexico, Peru", "gb": 195.64, "yoy": 46.3, "srch_g": 27000000, "srch_mes": 4500000.0, "books": 113000, "cvr": 0.42, "base": 49000000, "base_lbl": "49M", "base_fuente": "Miembros Latam Pass (dic 2024)", "conf": "confirmed", "pen": 9.1837, "quad": "LLEGAN", "r": 56.0, "x": 0.42, "y": 9.1837}, {"partner": "Viajes Naranja", "paises": "Argentina", "gb": 37.19, "yoy": 35.2, "srch_g": 3700000, "srch_mes": 616667.0, "books": 57100, "cvr": 1.56, "base": 9500000, "base_lbl": "9.5M", "base_fuente": "Clientes Naranja X (dic 2024)", "conf": "confirmed", "pen": 6.4912, "quad": "LLEGAN", "r": 30.1, "x": 1.56, "y": 6.4912}, {"partner": "Liverpool", "paises": "Mexico", "gb": 91.89, "yoy": 19.6, "srch_g": 3100000, "srch_mes": 516667.0, "books": 58800, "cvr": 1.89, "base": 5965610, "base_lbl": "6.0M", "base_fuente": "Tarjetas Liverpool Q4 2024", "conf": "confirmed", "pen": 8.6608, "quad": "LLEGAN", "r": 41.5, "x": 1.89, "y": 8.6608}, {"partner": "Didi", "paises": "Mexico", "gb": 1.07, "yoy": 256.6, "srch_g": 2400000, "srch_mes": 400000.0, "books": 4300, "cvr": 0.18, "base": 20000000, "base_lbl": "20M", "base_fuente": "Est. usuarios Didi M\u00e9xico", "conf": "estimated", "pen": 2.0, "quad": "LLEGAN", "r": 13.4, "x": 0.18, "y": 2.0}, {"partner": "BBVA", "paises": "Argentina, Colombia, Other Countries, Peru", "gb": 108.96, "yoy": -12.0, "srch_g": 1600000, "srch_mes": 266667.0, "books": 160500, "cvr": 10.23, "base": 3600000, "base_lbl": "3.6M", "base_fuente": "Clientes BBVA Argentina (2025)", "conf": "confirmed", "pen": 7.4074, "quad": "MADUROS", "r": 44.3, "x": 10.23, "y": 7.4074}, {"partner": "Livelo", "paises": "Brasil", "gb": 89.58, "yoy": 32.6, "srch_g": 695500, "srch_mes": 115917.0, "books": 104000, "cvr": 14.96, "base": 58000000, "base_lbl": "58M", "base_fuente": "Participantes Livelo (2025)", "conf": "confirmed", "pen": 0.1999, "quad": "CONVERSION", "r": 41.1, "x": 14.96, "y": 0.1999}, {"partner": "BNA", "paises": "Argentina", "gb": 3.09, "yoy": null, "srch_g": 381000, "srch_mes": 63500.0, "books": 7500, "cvr": 1.96, "base": 15000000, "base_lbl": "15M", "base_fuente": "Est. Banco Naci\u00f3n Argentina", "conf": "estimated", "pen": 0.4233, "quad": "LLEGAN", "r": 15.8, "x": 1.96, "y": 0.4233}, {"partner": "YPF", "paises": "Argentina", "gb": 0.3, "yoy": null, "srch_g": 191800, "srch_mes": 31967.0, "books": 778, "cvr": 0.41, "base": 10000000, "base_lbl": "10M", "base_fuente": "Est. asociados YPF Serviclub", "conf": "estimated", "pen": 0.3197, "quad": "DOBLE_OPP", "r": 11.8, "x": 0.41, "y": 0.3197}, {"partner": "TurismoCity", "paises": "Argentina", "gb": 4.98, "yoy": null, "srch_g": 183900, "srch_mes": 30650.0, "books": 13500, "cvr": 7.36, "base": 1000000, "base_lbl": "1.0M", "base_fuente": "Est. usuarios TurismoCity", "conf": "estimated", "pen": 3.065, "quad": "MADUROS", "r": 17.3, "x": 7.36, "y": 3.065}, {"partner": "Suburbia", "paises": "Mexico", "gb": 1.08, "yoy": 81.2, "srch_g": 143100, "srch_mes": 23850.0, "books": 1600, "cvr": 1.09, "base": 1864961, "base_lbl": "1.9M", "base_fuente": "Tarjetas Suburbia Q4 2024", "conf": "confirmed", "pen": 1.2788, "quad": "LLEGAN", "r": 13.4, "x": 1.09, "y": 1.2788}, {"partner": "Rakuten", "paises": "Brasil", "gb": 1.0, "yoy": -81.1, "srch_g": 130800, "srch_mes": 21800.0, "books": 2100, "cvr": 1.57, "base": 5000000, "base_lbl": "5.0M", "base_fuente": "Est. usuarios Rakuten Brasil", "conf": "estimated", "pen": 0.436, "quad": "LLEGAN", "r": 13.3, "x": 1.57, "y": 0.436}, {"partner": "Esfera", "paises": "Brasil", "gb": 13.46, "yoy": 63.5, "srch_g": 130200, "srch_mes": 21700.0, "books": 10000, "cvr": 7.7, "base": 69500000, "base_lbl": "70M", "base_fuente": "Clientes Santander Brasil \u2014 proxy Esfera", "conf": "estimated", "pen": 0.0312, "quad": "CONVERSION", "r": 22.1, "x": 7.7, "y": 0.0312}, {"partner": "Banco de Chile", "paises": "Chile", "gb": 7.63, "yoy": null, "srch_g": 127300, "srch_mes": 21217.0, "books": 11800, "cvr": 9.3, "base": 2600000, "base_lbl": "2.6M", "base_fuente": "Usuarios digitales Banco de Chile (2024)", "conf": "estimated", "pen": 0.816, "quad": "MADUROS", "r": 19.1, "x": 9.3, "y": 0.816}, {"partner": "ICBC", "paises": "Argentina", "gb": 16.96, "yoy": 24.9, "srch_g": 99500, "srch_mes": 16583.0, "books": 20500, "cvr": 20.61, "base": 1000000, "base_lbl": "1.0M", "base_fuente": "Hogares ICBC Argentina", "conf": "confirmed", "pen": 1.6583, "quad": "MADUROS", "r": 23.5, "x": 20.61, "y": 1.6583}, {"partner": "Cocos", "paises": "Argentina", "gb": 0.05, "yoy": null, "srch_g": 94000, "srch_mes": 15667.0, "books": 292, "cvr": 0.31, "base": 1000000, "base_lbl": "1.0M", "base_fuente": "Est. usuarios Cocos Argentina", "conf": "estimated", "pen": 1.5667, "quad": "LLEGAN", "r": 10.7, "x": 0.31, "y": 1.5667}, {"partner": "Macro", "paises": "Argentina", "gb": 0.41, "yoy": -81.6, "srch_g": 73400, "srch_mes": 12233.0, "books": 1700, "cvr": 2.32, "base": 3000000, "base_lbl": "3.0M", "base_fuente": "Est. clientes Banco Macro Argentina", "conf": "estimated", "pen": 0.4078, "quad": "LLEGAN", "r": 12.1, "x": 2.32, "y": 0.4078}, {"partner": "Sicredi", "paises": "Brasil", "gb": 5.0, "yoy": 156.5, "srch_g": 62200, "srch_mes": 10367.0, "books": 6700, "cvr": 10.85, "base": 8500000, "base_lbl": "8.5M", "base_fuente": "Asociados Sicredi (fin 2024)", "conf": "confirmed", "pen": 0.122, "quad": "CONVERSION", "r": 17.4, "x": 10.85, "y": 0.122}, {"partner": "Passaporte", "paises": "Brasil", "gb": 1.15, "yoy": -21.9, "srch_g": 57000, "srch_mes": 9500.0, "books": 1600, "cvr": 2.77, "base": 300000, "base_lbl": "300k", "base_fuente": "Est. usuarios Passaporte", "conf": "estimated", "pen": 3.1667, "quad": "LLEGAN", "r": 13.5, "x": 2.77, "y": 3.1667}, {"partner": "SuperClub", "paises": "Argentina", "gb": 2.27, "yoy": -28.2, "srch_g": 46300, "srch_mes": 7717.0, "books": 3800, "cvr": 8.26, "base": 500000, "base_lbl": "500k", "base_fuente": "Est. socios SuperClub", "conf": "estimated", "pen": 1.5433, "quad": "MADUROS", "r": 15.0, "x": 8.26, "y": 1.5433}, {"partner": "Nubank", "paises": "Brasil", "gb": 1.61, "yoy": 2378.8, "srch_g": 42000, "srch_mes": 7000.0, "books": 1700, "cvr": 3.94, "base": 102000000, "base_lbl": "102M", "base_fuente": "Clientes Nubank Brasil (dic 2024)", "conf": "confirmed", "pen": 0.0069, "quad": "CONVERSION", "r": 14.2, "x": 3.94, "y": 0.0069}, {"partner": "Caja Los Andes", "paises": "Chile", "gb": 1.06, "yoy": 39.6, "srch_g": 29300, "srch_mes": 4883.0, "books": 799, "cvr": 2.72, "base": 500000, "base_lbl": "500k", "base_fuente": "Est. socios Caja Los Andes Chile", "conf": "estimated", "pen": 0.9767, "quad": "LLEGAN", "r": 13.4, "x": 2.72, "y": 0.9767}, {"partner": "Bradesco", "paises": "Brasil", "gb": 0.81, "yoy": -11.7, "srch_g": 28400, "srch_mes": 4733.0, "books": 454, "cvr": 1.6, "base": 109110000, "base_lbl": "109M", "base_fuente": "Clientes Bradesco (ranking BC Q4 2024)", "conf": "confirmed", "pen": 0.0043, "quad": "DOBLE_OPP", "r": 13.0, "x": 1.6, "y": 0.0043}, {"partner": "Caixa", "paises": "Brasil", "gb": 0.39, "yoy": null, "srch_g": 27900, "srch_mes": 4650.0, "books": 1200, "cvr": 4.19, "base": 154165000, "base_lbl": "154M", "base_fuente": "Clientes Caixa (ranking BC Brasil Q4 2024)", "conf": "confirmed", "pen": 0.003, "quad": "CONVERSION", "r": 12.1, "x": 4.19, "y": 0.003}, {"partner": "Scotiabank", "paises": "Chile", "gb": 6.5, "yoy": 113.1, "srch_g": 27200, "srch_mes": 4533.0, "books": 4200, "cvr": 15.34, "base": 1370000, "base_lbl": "1.4M", "base_fuente": "Clientes Scotiabank Chile (dic 2024)", "conf": "confirmed", "pen": 0.3309, "quad": "CONVERSION", "r": 18.4, "x": 15.34, "y": 0.3309}, {"partner": "Meliuz", "paises": "Brasil", "gb": 1.78, "yoy": 42.9, "srch_g": 19200, "srch_mes": 3200.0, "books": 1400, "cvr": 7.15, "base": 10000000, "base_lbl": "10M", "base_fuente": "Est. usuarios M\u00e9liuz Brasil", "conf": "estimated", "pen": 0.032, "quad": "CONVERSION", "r": 14.4, "x": 7.15, "y": 0.032}, {"partner": "Vivo", "paises": "Brasil", "gb": 1.12, "yoy": 1489.7, "srch_g": 13900, "srch_mes": 2317.0, "books": 842, "cvr": 6.06, "base": 90000000, "base_lbl": "90M", "base_fuente": "Suscriptores Vivo/Telef\u00f3nica Brasil", "conf": "estimated", "pen": 0.0026, "quad": "CONVERSION", "r": 13.5, "x": 6.06, "y": 0.0026}, {"partner": "Nomad", "paises": "Brasil", "gb": 1.27, "yoy": -38.9, "srch_g": 12800, "srch_mes": 2133.0, "books": 580, "cvr": 4.53, "base": 1000000, "base_lbl": "1.0M", "base_fuente": "Est. clientes Nomad Brasil", "conf": "estimated", "pen": 0.2133, "quad": "CONVERSION", "r": 13.7, "x": 4.53, "y": 0.2133}, {"partner": "Claro", "paises": "Brasil", "gb": 0.07, "yoy": null, "srch_g": 5400, "srch_mes": 900.0, "books": 162, "cvr": 2.99, "base": 70000000, "base_lbl": "70M", "base_fuente": "Est. suscriptores Claro M\u00e9xico", "conf": "estimated", "pen": 0.0013, "quad": "DOBLE_OPP", "r": 10.9, "x": 2.99, "y": 0.0013}, {"partner": "Elektra", "paises": "Mexico", "gb": 0.41, "yoy": 91.4, "srch_g": 3900, "srch_mes": 650.0, "books": 61, "cvr": 1.56, "base": 3000000, "base_lbl": "3.0M", "base_fuente": "Est. clientes Banco Azteca/Elektra M\u00e9xico", "conf": "estimated", "pen": 0.0217, "quad": "DOBLE_OPP", "r": 12.1, "x": 1.56, "y": 0.0217}, {"partner": "ITAU", "paises": "Brasil", "gb": 34.39, "yoy": 66913.6, "srch_g": 3400, "srch_mes": 567.0, "books": 622, "cvr": 18.28, "base": 70000000, "base_lbl": "70M", "base_fuente": "Est. clientes Ita\u00fa Brasil", "conf": "estimated", "pen": 0.0008, "quad": "CONVERSION", "r": 29.3, "x": 18.28, "y": 0.0008}, {"partner": "Bice", "paises": "Chile", "gb": 0.26, "yoy": 28.7, "srch_g": 3300, "srch_mes": 550.0, "books": 172, "cvr": 5.29, "base": 300000, "base_lbl": "300k", "base_fuente": "Est. clientes Banco Bice Chile", "conf": "estimated", "pen": 0.1833, "quad": "CONVERSION", "r": 11.7, "x": 5.29, "y": 0.1833}];
+const CVR_MED=3.94;
+const PEN_MED=0.4078;
+const CVR_MAX=25;
+const PEN_MAX=10.3;
+const C={
+  MADUROS   :{bg:'rgba(56,189,248,.18)',bd:'#38bdf8',tx:'#7dd3fc',lbl:'✅ Alta pen. + Alta CVR'},
+  LLEGAN    :{bg:'rgba(139,92,246,.18)',bd:'#8b5cf6',tx:'#c4b5fd',lbl:'🔧 Alta pen. + Baja CVR'},
+  CONVERSION:{bg:'rgba(22,163,74,.18)',bd:'#22c55e',tx:'#4ade80',lbl:'📣 Baja pen. + Alta CVR'},
+  DOBLE_OPP :{bg:'rgba(234,88,12,.18)',bd:'#f97316',tx:'#fb923c',lbl:'🚀 Baja pen. + Baja CVR'},
+};
+let W,H,PAD,aQ='ALL',hIdx=-1;
+const cv=document.getElementById('mx'),ctx=cv.getContext('2d');
+function resize(){const w=document.getElementById('cw');W=w.clientWidth-42;H=w.clientHeight-22;cv.width=W;cv.height=H;PAD={l:76,r:24,t:24,b:48};draw();}
+function xp(v){return PAD.l+(Math.min(v,CVR_MAX)/CVR_MAX)*(W-PAD.l-PAD.r);}
+function yp(v){return(H-PAD.b)-(Math.min(v,PEN_MAX)/PEN_MAX)*(H-PAD.t-PAD.b);}
+function yTicks(){
+  const ticks=[];
+  const step=PEN_MAX<=1?0.1:PEN_MAX<=3?0.5:PEN_MAX<=10?1:2;
+  for(let v=0;v<=PEN_MAX+step;v=Math.round((v+step)*100)/100)ticks.push(v);
+  return ticks;
+}
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  const L=PAD.l,R=W-PAD.r,T=PAD.t,B=H-PAD.b,xM=xp(CVR_MED),yM=yp(PEN_MED);
+  ctx.save();ctx.beginPath();ctx.rect(L,T,R-L,B-T);ctx.clip();
+  [[L,T,xM-L,yM-T,C.LLEGAN.bg],[xM,T,R-xM,yM-T,C.MADUROS.bg],
+   [L,yM,xM-L,B-yM,C.DOBLE_OPP.bg],[xM,yM,R-xM,B-yM,C.CONVERSION.bg]]
+  .forEach(([x,y,w,h,c])=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h);});
+  ctx.restore();
+  ctx.save();ctx.beginPath();ctx.rect(L,T,R-L,B-T);ctx.clip();
+  ctx.strokeStyle='#1e293b';ctx.lineWidth=1;
+  for(let v=0;v<=CVR_MAX;v+=5){ctx.beginPath();ctx.moveTo(xp(v),T);ctx.lineTo(xp(v),B);ctx.stroke();}
+  yTicks().forEach(v=>{ctx.beginPath();ctx.moveTo(L,yp(v));ctx.lineTo(R,yp(v));ctx.stroke();});
+  ctx.restore();
+  ctx.strokeStyle='#94a3b8';ctx.lineWidth=1.5;ctx.setLineDash([6,3]);
+  ctx.beginPath();ctx.moveTo(xM,T);ctx.lineTo(xM,B);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(L,yM);ctx.lineTo(R,yM);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.save();ctx.beginPath();ctx.rect(L,T,R-L,B-T);ctx.clip();
+  ctx.font='bold 11px Segoe UI,sans-serif';ctx.globalAlpha=.4;ctx.textAlign='center';
+  [[(L+xM)/2,T+16,C.LLEGAN.tx,'🔧 Alta pen. + Baja CVR'],
+   [(xM+R)/2,T+16,C.MADUROS.tx,'✅ Alta pen. + Alta CVR'],
+   [(L+xM)/2,B-9,C.DOBLE_OPP.tx,'🚀 Baja pen. + Baja CVR'],
+   [(xM+R)/2,B-9,C.CONVERSION.tx,'📣 Baja pen. + Alta CVR']]
+  .forEach(([x,y,c,l])=>{ctx.fillStyle=c;ctx.fillText(l,x,y);});
+  ctx.globalAlpha=1;ctx.restore();
+  ctx.font='10px Segoe UI,sans-serif';ctx.fillStyle='#64748b';
+  ctx.textAlign='center';ctx.fillText(`mediana CVR ${CVR_MED}%`,xM,B+34);
+  ctx.textAlign='right';ctx.fillText(`med. pen. ${PEN_MED}% →`,xM-8,yM-5);
+  ctx.textAlign='center';ctx.fillStyle='#64748b';ctx.font='11px Segoe UI,sans-serif';
+  for(let v=0;v<=CVR_MAX;v+=5){const px=xp(v);ctx.fillText(v+'%',px,B+16);ctx.strokeStyle='#334155';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(px,B);ctx.lineTo(px,B+4);ctx.stroke();}
+  ctx.textAlign='right';ctx.fillStyle='#64748b';
+  yTicks().forEach(v=>{const py=yp(v);if(py<T-4||py>B+4)return;ctx.fillText(v+'%',L-7,py+4);ctx.strokeStyle='#334155';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(L-3,py);ctx.lineTo(L,py);ctx.stroke();});
+  ctx.strokeStyle='#334155';ctx.lineWidth=1.5;ctx.strokeRect(L,T,R-L,B-T);
+  [...PTS].sort((a,b)=>b.r-a.r).forEach(p=>{
+    const i=PTS.indexOf(p),show=(aQ==='ALL'||p.quad===aQ);
+    const px=xp(p.x),py=yp(p.y);
+    if(px<L-20||px>R+20||py<T-20||py>B+20)return;
+    const col=C[p.quad];
+    ctx.globalAlpha=show?(hIdx===i?1:.82):.08;
+    if(hIdx===i){ctx.shadowBlur=22;ctx.shadowColor=col.bd;}
+    ctx.beginPath();ctx.arc(px,py,p.r,0,Math.PI*2);
+    ctx.fillStyle=col.bd+'22';ctx.fill();
+    ctx.strokeStyle=col.bd;ctx.lineWidth=hIdx===i?2.5:1.5;
+    if(p.conf==='estimated')ctx.setLineDash([4,3]);
+    ctx.stroke();ctx.setLineDash([]);ctx.shadowBlur=0;
+    if(show){
+      const fs=p.r>30?11:p.r>18?10:9;
+      ctx.font=`${hIdx===i?'bold ':''}${fs}px Segoe UI,sans-serif`;
+      ctx.fillStyle='#f1f5f9';ctx.textAlign='center';
+      const lb=p.partner.length>15?p.partner.slice(0,14)+'…':p.partner;
+      ctx.fillText(lb,px,py-p.r-4);
+    }
+    ctx.globalAlpha=1;
+  });
+}
+const tt=document.getElementById('tt');
+function fmtN(n){if(n>=1e6)return(n>=10e6?(n/1e6).toFixed(0):(n/1e6).toFixed(1))+'M';if(n>=1e3)return Math.round(n/1e3)+'k';return n.toLocaleString();}
+cv.addEventListener('mousemove',e=>{
+  const rc=cv.getBoundingClientRect(),mx=e.clientX-rc.left,my=e.clientY-rc.top;
+  let f=-1;for(let i=0;i<PTS.length;i++){if(Math.hypot(mx-xp(PTS[i].x),my-yp(PTS[i].y))<PTS[i].r+4){f=i;break;}}
+  if(f!==hIdx){hIdx=f;draw();}
+  if(f>=0){
+    const p=PTS[f],col=C[p.quad];
+    const yoy=p.yoy!=null?(p.yoy>=0?`<span class="tt-val pos">+${p.yoy}%</span>`:`<span class="tt-val neg">${p.yoy}%</span>`):`<span class="tt-val" style="color:#475569">N/D</span>`;
+    const cvrC=p.cvr>=10?'#4ade80':p.cvr>=5?'#facc15':p.cvr>=1?'#fb923c':'#f87171';
+    const penC=p.pen>=2?'#4ade80':p.pen>=0.5?'#facc15':p.pen>=0.1?'#fb923c':'#f87171';
+    const estTag=p.conf==='estimated'?'<span style="font-size:10px;color:#78716c"> (estimado)</span>':'<span style="font-size:10px;color:#4ade80"> ✓</span>';
+    tt.innerHTML=`
+      <div class="tt-name">${p.partner}</div>
+      <div class="tt-badge" style="background:${col.bg};color:${col.tx}">${col.lbl}</div>
+      <div class="tt-sec">👥 Penetración mensual (eje Y)</div>
+      <div class="tt-row"><span>Base total del partner</span><span class="tt-val hl">${fmtN(p.base)}${estTag}</span></div>
+      <div class="tt-row" style="font-size:10px;color:#475569;font-style:italic"><span>${p.base_fuente}</span></div>
+      <div class="tt-row"><span>Searchers H1 2026 (Gold)</span><span class="tt-val">${fmtN(p.srch_g)}</span></div>
+      <div class="tt-row"><span>Searchers promedio mensual</span><span class="tt-val">${fmtN(p.srch_mes)}</span></div>
+      <div class="bar-wrap">
+        <div class="bar-lbl"><span>Penetración = srch/mes ÷ base</span><span style="color:${penC};font-weight:700">${p.pen.toFixed(3)}%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.min(p.pen/PEN_MAX*100,100)}%;background:${penC}"></div></div>
+      </div>
+      <div class="tt-div"></div>
+      <div class="tt-sec">📈 CVR (eje X)</div>
+      <div class="tt-row"><span>Bookings H1 2026</span><span class="tt-val">${fmtN(p.books)}</span></div>
+      <div class="bar-wrap">
+        <div class="bar-lbl"><span>CVR = bookings / searchers</span><span style="color:${cvrC};font-weight:700">${p.cvr.toFixed(2)}%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.min(p.cvr/CVR_MAX*100,100)}%;background:${cvrC}"></div></div>
+      </div>
+      <div class="tt-div"></div>
+      <div class="tt-row"><span>GB 12m</span><span class="tt-val">${p.gb>0?'$'+p.gb.toFixed(1)+'M':'—'}</span></div>
+      <div class="tt-row"><span>YoY</span>${yoy}</div>
+      <div class="tt-row"><span>Países</span><span class="tt-val" style="font-size:10px;max-width:160px;text-align:right">${p.paises}</span></div>`;
+    const tw=315,th=460;
+    tt.style.left=(e.clientX+16+tw>innerWidth?e.clientX-tw-8:e.clientX+16)+'px';
+    tt.style.top=(e.clientY-20+th>innerHeight?e.clientY-th:e.clientY-20)+'px';
+    tt.style.display='block';cv.style.cursor='pointer';
+  }else{tt.style.display='none';cv.style.cursor='default';}
+});
+cv.addEventListener('mouseleave',()=>{tt.style.display='none';hIdx=-1;draw();});
+function fq(q,btn){
+  aQ=q;document.querySelectorAll('.fb-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.qc').forEach(c=>c.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const card=document.getElementById('qc-'+q);if(card)card.classList.add('active');
+  fp(document.getElementById('searchBox').value);draw();
+}
+function fp(search=''){
+  const list=document.getElementById('partnerList');
+  const filt=[...PTS].filter(p=>aQ==='ALL'||p.quad===aQ).filter(p=>p.partner.toLowerCase().includes(search.toLowerCase())).sort((a,b)=>b.pen-a.pen);
+  const cC=v=>v>=10?'#4ade80':v>=5?'#facc15':v>=1?'#fb923c':'#f87171';
+  list.innerHTML=filt.map(p=>{
+    const col=C[p.quad];
+    return`<div class="pi" style="border-left-color:${col.bd}" onclick="hl(${PTS.indexOf(p)})">
+      <div><div class="pn">${p.partner}${p.conf==='estimated'?' <span style="font-size:9px;color:#475569">est.</span>':''}</div>
+      <div class="ps">Pen <span style="color:#38bdf8;font-weight:600">${p.pen.toFixed(3)}%</span> · CVR <span style="color:${cC(p.cvr)};font-weight:600">${p.cvr.toFixed(1)}%</span></div></div>
+      <div class="pg">${p.gb>0?'$'+p.gb.toFixed(1)+'M':'—'}</div>
+    </div>`;
+  }).join('');
+}
+function hl(i){hIdx=i;draw();}
+window.addEventListener('resize',resize);
+resize();fp();
+</script>
+</body>
+</html>
